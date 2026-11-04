@@ -1,0 +1,23 @@
+{
+  "name": "serversmasters",
+  "version": "1.0.0",
+  "description": "ServedYouAre - Business Exchange + Social Media Hub",
+  "main": "Html.indexed",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephentlou586/Serversmasters.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stephentlou586/Serversmasters/issues"
+  },
+  "homepage": "https://github.com/stephentlou586/Serversmasters#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
