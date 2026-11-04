@@ -1,0 +1,23 @@
+{
+  "name": "serversmasters",
+  "version": "1.0.0",
+  "description": "ServedYouAre - Business Exchange + Social Media Hub",
+  "main": "Html.indexed",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephentlou586/Serversmasters.git"
+  },
+  "keywords": [
+    "marketplace",
+    "social",
+    "business"
+  ],
+  "author": "Stephen Tlou",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.0"
+  }
+}

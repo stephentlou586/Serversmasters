@@ -100,4 +100,20 @@ function commentP(id){const txt=prompt('Your comment:');if(!txt)return;const p=p
 function orderP(id){const p=profiles.find(x=>x.id===id);const msg=prompt('What do you order from '+p.name+'?');if(!msg)return;let o=JSON.parse(localStorage.getItem(ORD)||'[]');o.unshift({to:p.name,msg,from:getUser()?.email||'Guest',time:new Date().toLocaleString()});localStorage.setItem(ORD,JSON.stringify(o));alert('Order sent');renderOrders();}
 function renderOrders(){const el=document.getElementById('orders');let o=JSON.parse(localStorage.getItem(ORD)||'[]');el.innerHTML=o.slice(0,8).map(x=>`<div class="comment"><b>${x.from}</b> → ${x.to}: ${x.msg}<br><small>${x.time}</small></div>`).join('')||'<small>No orders yet</small>';}
 function sendChat(){const i=document.getElementById('chatInput'),t=i.value;if(!t)return;let c=JSON.parse(localStorage.getItem(CHAT)||'[]');c.push({by:getUser()?.email||'Guest',text:t,time:new Date().toLocaleString()});localStorage.setItem(CHAT,JSON.stringify(c));i.value='';renderChat();}
-function renderChat(){const el=document.getElementById('chatBox');let c=JSON.parse(localStorage.getItem(CHAT)||'[]');el.innerHTML=c.slice(-10).map(x=>`<div class="comment"><b>${x.by}:</b> ${x.te
+function renderChat(){const el=document.getElementById('chatBox');let c=JSON.parse(localStorage.getItem(CHAT)||'[]');el.innerHTML=c.slice(-10).map(x=>`<div class="comment"><b>${x.by}:</b> ${x.text}</div>`).join('')||'<small>No messages</small>';}
+function renderAdmin(){const f=document.getElementById('adminFilter').value;let list=profiles;if(f==='pending')list=profiles.filter(p=>p.status==='pending');else if(f==='approved')list=profiles.filter(p=>p.status==='approved');else if(f==='expiring')list=profiles.filter(p=>p.status==='approved'&&daysLeft(p.expiry)<=5&&daysLeft(p.expiry)>=0);else if(f==='expired')list=profiles.filter(p=>p.status==='approved'&&p.expiry&&daysLeft(p.expiry)<0);else if(f==='rejected')list=profiles.filter(p=>p.status==='rejected');document.getElementById('adminList').innerHTML=list.map(p=>{const d=daysLeft(p.expiry);const socialCount=(p.socials?Object.values(p.socials).filter(v=>v).length:0);return `<div class="adminRow"><div><b>${p.name}</b> (${p.title}) - ${p.type}<br><small>Owner:${p.owner} | Ref:${p.payref} | Status:<span class="badge ${d<0&&p.status==='approved'?'expired':p.status}">${p.status}</span> | ${socialCount} socials | ${d}d left</small>${socialsHTML(p.socials)}<br><small>${p.bio}</small></div><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn green" onclick="approve('${p.id}')">✓</button><button class="btn red" onclick="reject('${p.id}')">✗</button><button class="btn orange" onclick="remind('${p.id}')">🔔</button><button class="btn light" onclick="deleteP('${p.id}')">DEL</button></div></div>`}).join('')||'<p>No profiles in this category</p>';}
+function approve(id){const p=profiles.find(x=>x.id===id);if(!p)return;p.status='approved';p.expiry=Date.now()+1000*60*60*24*30;save();renderAdmin();alert(p.name+' approved for 30 days');}
+function reject(id){const p=profiles.find(x=>x.id===id);if(!p)return;p.status='rejected';save();renderAdmin();alert(p.name+' rejected');}
+function deleteP(id){if(!confirm('Delete?'))return;profiles=profiles.filter(x=>x.id!==id);save();renderAdmin();alert('Deleted');}
+function remind(id){const p=profiles.find(x=>x.id===id);if(!p)return;alert('Reminder sent to '+p.owner+' for '+p.name+' (WhatsApp: '+p.contact+')');}
+function sendBulkReminders(){const expiring=profiles.filter(p=>p.status==='approved'&&daysLeft(p.expiry)<=5&&daysLeft(p.expiry)>=0);alert('Sent '+expiring.length+' reminders');}
+updateUser();render();
+</script>
+
+<!-- Vercel Speed Insights -->
+<script>
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+
+</body></html>
