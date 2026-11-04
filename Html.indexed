@@ -100,4 +100,17 @@ function commentP(id){const txt=prompt('Your comment:');if(!txt)return;const p=p
 function orderP(id){const p=profiles.find(x=>x.id===id);const msg=prompt('What do you order from '+p.name+'?');if(!msg)return;let o=JSON.parse(localStorage.getItem(ORD)||'[]');o.unshift({to:p.name,msg,from:getUser()?.email||'Guest',time:new Date().toLocaleString()});localStorage.setItem(ORD,JSON.stringify(o));alert('Order sent');renderOrders();}
 function renderOrders(){const el=document.getElementById('orders');let o=JSON.parse(localStorage.getItem(ORD)||'[]');el.innerHTML=o.slice(0,8).map(x=>`<div class="comment"><b>${x.from}</b> → ${x.to}: ${x.msg}<br><small>${x.time}</small></div>`).join('')||'<small>No orders yet</small>';}
 function sendChat(){const i=document.getElementById('chatInput'),t=i.value;if(!t)return;let c=JSON.parse(localStorage.getItem(CHAT)||'[]');c.push({by:getUser()?.email||'Guest',text:t,time:new Date().toLocaleString()});localStorage.setItem(CHAT,JSON.stringify(c));i.value='';renderChat();}
-function renderChat(){const el=document.getElementById('chatBox');let c=JSON.parse(localStorage.getItem(CHAT)||'[]');el.innerHTML=c.slice(-10).map(x=>`<div class="comment"><b>${x.by}:</b> ${x.te
+function renderChat(){const el=document.getElementById('chatBox');let c=JSON.parse(localStorage.getItem(CHAT)||'[]');el.innerHTML=c.slice(-10).map(x=>`<div class="comment"><b>${x.by}:</b> ${x.text}</div>`).join('')||'<small>No messages</small>';}
+function renderAdmin(){const filter=document.getElementById('adminFilter').value;const list=document.getElementById('adminList');let filtered=profiles;if(filter==='pending')filtered=profiles.filter(p=>p.status==='pending');else if(filter==='approved')filtered=profiles.filter(p=>p.status==='approved');else if(filter==='rejected')filtered=profiles.filter(p=>p.status==='rejected');else if(filter==='expired')filtered=profiles.filter(p=>p.status==='approved'&&p.expiry&&daysLeft(p.expiry)<0);else if(filter==='expiring')filtered=profiles.filter(p=>p.status==='approved'&&p.expiry&&daysLeft(p.expiry)<=5&&daysLeft(p.expiry)>=0);list.innerHTML=filtered.map(p=>{const d=daysLeft(p.expiry);return `<div class="adminRow"><div><b>${p.name}</b> - ${p.title} <span class="badge ${p.status}">${p.status}</span><br><small>Owner: ${p.owner} | Ref: ${p.payref} | ${d}d left</small>${socialsHTML(p.socials)}</div><div style="display:flex;gap:4px"><button class="btn green" onclick="approveP('${p.id}')">✓</button><button class="btn red" onclick="rejectP('${p.id}')">✗</button><button class="btn orange" onclick="remindP('${p.id}')">Remind</button></div></div>`}).join('')||'<p>No profiles</p>';}
+function approveP(id){const p=profiles.find(x=>x.id===id);if(!p)return;p.status='approved';p.expiry=Date.now()+1000*60*60*24*30;save();renderAdmin();alert('Approved + 30 days');}
+function rejectP(id){const p=profiles.find(x=>x.id===id);if(!p)return;p.status='rejected';save();renderAdmin();alert('Rejected');}
+function remindP(id){const p=profiles.find(x=>x.id===id);if(!p)return;alert(`REMINDER: Contact ${p.owner} - ${p.contact} - Profile ${p.name} - Ref ${p.payref}`);}
+function sendBulkReminders(){const expiring=profiles.filter(p=>p.status==='approved'&&p.expiry&&daysLeft(p.expiry)<=5&&daysLeft(p.expiry)>=0);alert(`${expiring.length} profiles expiring - Contact each owner:\n`+expiring.map(p=>`${p.owner} - ${p.contact}`).join('\n'));}
+updateUser();render();
+</script>
+<!-- Vercel Speed Insights -->
+<script>
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>
